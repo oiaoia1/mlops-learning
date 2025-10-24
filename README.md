@@ -1,2 +1,1 @@
-# mlops-learning
-MLOps 45-day learning project
+# MLOps 45-Day Learning Project
