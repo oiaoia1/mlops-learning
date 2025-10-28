@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: house-price-model
+  labels:
+    app: house-price-model
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: house-price-model
+  template:
+    metadata:
+      labels:
+        app: house-price-model
+    spec:
+      containers:
+      - name: model-api
+        image: house-price-model:v1
+        ports:
+        - containerPort: 8000
+        env:
+        - name: HOSTNAME
+          valueFrom:
+            fieldRef:
+              fieldPath: metadata.name
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "200m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 15
+          periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: house-price-service
+spec:
+  selector:
+    app: house-price-model
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8000
+      nodePort: 30080
+  type: NodePort
