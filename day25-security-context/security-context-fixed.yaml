@@ -1,0 +1,20 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: security-demo-fixed
+spec:
+  securityContext:
+    runAsNonRoot: true
+    runAsUser: 101  # nginx用户的标准UID
+    runAsGroup: 101 # nginx用户的标准GID
+  containers:
+  - name: nginx-secure
+    image: nginx:alpine
+    securityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop:
+        - ALL
+      readOnlyRootFilesystem: false  # 暂时禁用，后续优化为卷挂载
+    ports:
+    - containerPort: 80
