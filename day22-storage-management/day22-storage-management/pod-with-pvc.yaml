@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pvc-test-pod
+spec:
+  containers:
+  - name: test-container
+    image: nginx:alpine
+    volumeMounts:
+    - name: pvc-storage
+      mountPath: /data
+  volumes:
+  - name: pvc-storage
+    persistentVolumeClaim:
+      claimName: my-first-pvc
