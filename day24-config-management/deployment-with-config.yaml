@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-with-config
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx-config-demo
+  template:
+    metadata:
+      labels:
+        app: nginx-config-demo
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        env:
+        # 从ConfigMap注入环境变量
+        - name: APP_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: app.name
+        - name: APP_ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: app.environment
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/nginx/conf.d
+      volumes:
+      - name: config-volume
+        configMap:
+          name: app-config
+          items:
+          - key: nginx.conf
+            path: nginx.conf

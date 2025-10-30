@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-basic
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-basic
+  template:
+    metadata:
+      labels:
+        app: nginx-basic
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        env:
+        - name: APP_NAME
+          value: "TestApp"

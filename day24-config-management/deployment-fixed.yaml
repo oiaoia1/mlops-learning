@@ -1,0 +1,48 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-config-fixed
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: nginx-config-fixed
+  template:
+    metadata:
+      labels:
+        app: nginx-config-fixed
+    spec:
+      containers:
+      - name: nginx-container
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        env:
+        # 环境变量注入 - 安全无冲突
+        - name: APP_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: app.name
+        - name: APP_ENVIRONMENT
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: app.environment
+        volumeMounts:
+        # 使用不冲突的自定义路径
+        - name: config-volume
+          mountPath: /etc/my-app-config
+        - name: nginx-config-volume
+          mountPath: /etc/nginx/conf.d/custom.conf
+          subPath: nginx.conf
+      volumes:
+      - name: config-volume
+        configMap:
+          name: app-config
+      - name: nginx-config-volume
+        configMap:
+          name: app-config
+          items:
+          - key: nginx.conf
+            path: nginx.conf

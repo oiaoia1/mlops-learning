@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: final-test
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: final-test
+  template:
+    metadata:
+      labels:
+        app: final-test
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        volumeMounts:
+        - name: test-config
+          mountPath: /usr/share/nginx/html/test.txt
+          subPath: test.txt
+      volumes:
+      - name: test-config
+        configMap:
+          name: app-config
+          items:
+          - key: app.name
+            path: test.txt

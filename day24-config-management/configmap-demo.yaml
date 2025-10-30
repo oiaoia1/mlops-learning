@@ -1,0 +1,33 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: default
+data:
+  # 简单键值对配置
+  app.name: "MLOps学习平台"
+  app.environment: "development"
+  log.level: "DEBUG"
+  
+  # 应用配置文件
+  application.properties: |
+    server.port=8080
+    database.url=jdbc:mysql://mysql-service:3306/learn
+    cache.enabled=true
+    feature.new_ui=true
+    
+  # Nginx配置
+  nginx.conf: |
+    server {
+        listen 80;
+        server_name localhost;
+        
+        location / {
+            proxy_pass http://backend:8080;
+            proxy_set_header Host $host;
+        }
+        
+        location /static/ {
+            alias /var/www/static/;
+        }
+    }

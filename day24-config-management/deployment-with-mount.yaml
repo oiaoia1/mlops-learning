@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-with-mount
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-with-mount
+  template:
+    metadata:
+      labels:
+        app: nginx-with-mount
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:alpine
+        ports:
+        - containerPort: 80
+        env:
+        - name: APP_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              key: app.name
+        volumeMounts:
+        # 使用安全的挂载路径
+        - name: config-volume
+          mountPath: /tmp/app-config
+      volumes:
+      - name: config-volume
+        configMap:
+          name: app-config
